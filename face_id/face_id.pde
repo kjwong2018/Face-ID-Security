@@ -29,22 +29,22 @@ void setup(){
   video = new GLCapture(this,devices[0],640,480,30);
   println(video);
   video.start();
-  BufferedReader reader = createReader("dfilenum.txt");
-  String line = null;
-   try{
-    while((line = reader.readLine()) != null){
-      String[] pieces = split(line, TAB);
-      int num = int(pieces[0]);
-      dfilenum = num;
-    }
-    reader.close();
-  }
-  catch (IOException e){
-    output = createWriter("dfilenum.txt");
-    output.println(dfilenum);
-    output.close();
-  }
-  println(dfilenum);
+  //BufferedReader reader = createReader("dfilenum.txt");
+  //String line = null;
+  // try{
+  //  while((line = reader.readLine()) != null){
+  //    String[] pieces = split(line, TAB);
+  //    int num = int(pieces[0]);
+  //    dfilenum = num;
+  //  }
+  //  reader.close();
+  //}
+  //catch (IOException e){
+  //  output = createWriter("dfilenum.txt");
+  //  output.println(dfilenum);
+  //  output.close();
+  //}
+  //println(dfilenum);
 }
 void keyPressed(){
   if(key == 'r' || key == 'R'){
@@ -57,27 +57,51 @@ void keyPressed(){
     compareBW.save("Image"+dfilenum+".jpg");
     calculateImage(compareBW);
     saveImageData();
+    dfilenum++;
   }
   if(key == ' '){
     PImage center = get(221,116,200,250);
     blackwhite(center);
     calculateImage(compareBW);
-    compareBW.save("Compare"+dfilenum+".jpg");
-    readImageData();
-    compareImageData();
-    println(matchP);
+    compareBW.save("Compare0.jpg");
     compare = false;
-    if(matchP > 20){
-      pass = false;
+    for(int num = 0; num<dfilenum;num++){
+      readImageData(num);
+      compareImageData();
+      println("-----------");
+      println(num);
+      println(matchP);
+      println("-----------");
+      if(matchP >= 20){
+        pass = false;
+      }
+      else if(matchP < 20){
+        pass = true;
+        break;
+      } 
     }
-    else if(matchP <= 20){
-      pass = true;
-    } 
   }
   if(key == 'q' || key == 'Q'){
-    output = createWriter("dfilenum.txt");
-    output.println(dfilenum);
-    output.close();
+    //output = createWriter("dfilenum.txt");
+    //output.println(dfilenum);
+    //output.close();
+    for(int num = 0; num<dfilenum;num++){
+      String filename = sketchPath("Image"+num+".txt");
+      String imagename = sketchPath("Image"+num+".jpg");
+      File f = new File(filename);
+      File image = new File(imagename);
+      if(f.exists()){
+        f.delete();
+      }
+      if(image.exists()){
+        image.delete();
+      }
+    }
+    String filename = sketchPath("Compare0.jpg");
+    File f = new File(filename);
+    if(f.exists()){
+        f.delete();
+      }
     exit();
   }
 }
@@ -138,8 +162,8 @@ void calculateImage(PImage image){
   }
 }
 
-void readImageData(){
-  BufferedReader reader = createReader("Image"+dfilenum+".txt");
+void readImageData(int dfile){
+  BufferedReader reader = createReader("Image"+dfile+".txt");
   String line = null;
   dbWhitePixel = new int[250];
   int i = 0;
